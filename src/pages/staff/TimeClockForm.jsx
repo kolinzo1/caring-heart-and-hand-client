@@ -11,7 +11,7 @@ import {
 import { Button } from "../../components/ui/button";
 import { Select } from "../../components/ui/select";
 import { Input } from "../../components/ui/input";
-import { Clock, Play, Square, Calendar } from "lucide-react";
+import { Clock } from "lucide-react";
 
 const TimeClockForm = () => {
   const navigate = useNavigate();
@@ -32,12 +32,18 @@ const TimeClockForm = () => {
 
   const fetchClients = async () => {
     try {
-      const mockClients = [
-        { id: 1, name: "John Doe" },
-        { id: 2, name: "Jane Smith" },
-        { id: 3, name: "Robert Johnson" },
-      ];
-      setClients(mockClients);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/clients`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch clients');
+      }
+
+      const data = await response.json();
+      setClients(data);
     } catch (error) {
       addToast({
         title: "Error",
@@ -50,9 +56,7 @@ const TimeClockForm = () => {
   const calculateDuration = () => {
     if (!formData.startTime || !formData.endTime) return "";
 
-    const [startHours, startMinutes] = formData.startTime
-      .split(":")
-      .map(Number);
+    const [startHours, startMinutes] = formData.startTime.split(":").map(Number);
     const [endHours, endMinutes] = formData.endTime.split(":").map(Number);
 
     let hours = endHours - startHours;
@@ -84,7 +88,18 @@ const TimeClockForm = () => {
 
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/time-logs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to log shift');
+      }
 
       addToast({
         title: "Success",
@@ -129,7 +144,7 @@ const TimeClockForm = () => {
                 <option value="">Select a client</option>
                 {clients.map((client) => (
                   <option key={client.id} value={client.id}>
-                    {client.name}
+                    {`${client.first_name} ${client.last_name}`}
                   </option>
                 ))}
               </Select>
