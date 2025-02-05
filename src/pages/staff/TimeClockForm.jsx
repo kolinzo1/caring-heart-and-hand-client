@@ -44,8 +44,14 @@ const TimeClockForm = () => {
   const fetchClients = async () => {
     try {
       const token = localStorage.getItem('token');
-      console.log('Auth token:', token); // Check if token exists
+      console.log('Using token:', token); // Debug log
       
+      if (!token) {
+        console.log('No token found, redirecting to login');
+        navigate('/login');
+        return;
+      }
+  
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/clients`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -53,7 +59,10 @@ const TimeClockForm = () => {
         },
       });
       
-      console.log('API Response:', response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       console.log('Clients data:', data);
       setClients(data);
