@@ -8,6 +8,13 @@ import {
   CardDescription,
   CardContent,
 } from "../../components/ui/card";
+import { 
+  Select, 
+  SelectTrigger, 
+  SelectValue, 
+  SelectContent, 
+  SelectItem 
+} from "../../components/ui/select";
 import { Button } from "../../components/ui/button";
 import { Select } from "../../components/ui/select";
 import { Input } from "../../components/ui/input";
@@ -135,18 +142,18 @@ const TimeClockForm = () => {
               <label className="block text-sm font-medium mb-2">Client *</label>
               <Select
                 value={formData.clientId}
-                onChange={(e) =>
-                  setFormData({ ...formData, clientId: e.target.value })
-                }
-                className="w-full"
-                required
+                onValueChange={(value) => setFormData({ ...formData, clientId: value })}
               >
-                <option value="">Select a client</option>
-                {clients.map((client) => (
-                  <option key={client.id} value={client.id}>
-                    {`${client.first_name} ${client.last_name}`}
-                  </option>
-                ))}
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a client" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clients.map((client) => (
+                    <SelectItem key={client.id} value={client.id.toString()}>
+                      {`${client.first_name} ${client.last_name}`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </div>
 
