@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import {
   Clock,
   Calendar,
@@ -11,89 +12,78 @@ import {
 
 const StaffDashboard = () => {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState({
-    name: "John Doe",
-    role: "Staff",
-    assignedClients: 5,
-    todayShifts: 2,
-    pendingReports: 3,
+  const { token, logout } = useAuth();
+  const [dashboardData, setDashboardData] = useState({
+    assignedClients: 0,
+    todayShifts: 0,
+    pendingReports: 0
   });
+  const [recentShifts, setRecentShifts] = useState([]);
 
-  const [recentShifts, setRecentShifts] = useState([
-    {
-      id: 1,
-      clientName: "Alice Johnson",
-      date: "2024-02-01",
-      time: "09:00 AM - 11:00 AM",
-      status: "Completed",
-    },
-    {
-      id: 2,
-      clientName: "Bob Smith",
-      date: "2024-02-01",
-      time: "02:00 PM - 04:00 PM",
-      status: "Upcoming",
-    },
-  ]);
+  useEffect(() => {
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    fetchDashboardData();
+    fetchRecentShifts();
+  }, [token, navigate]);
+
+  const fetchDashboardData = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/staff/dashboard`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      setDashboardData(data);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    }
+  };
+
+  const fetchRecentShifts = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/time-logs/recent`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      setRecentShifts(data);
+    } catch (error) {
+      console.error('Error fetching shifts:', error);
+    }
+  };
 
   const handleLogout = () => {
-    // Clear local storage/session
-    localStorage.removeItem("token");
-    navigate("/login");
+    logout();
+    navigate('/login');
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="p-6">
       {/* Top Navigation */}
-      <nav
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "20px",
-          backgroundColor: "white",
-          borderRadius: "8px",
-          marginBottom: "20px",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <User />
+      <nav className="flex justify-between items-center p-5 bg-white rounded-lg mb-6 shadow-sm">
+        <div className="flex items-center gap-3">
+          <User className="w-10 h-10 text-primary" />
           <div>
-            <h2 style={{ margin: 0 }}>{userData.name}</h2>
-            <p style={{ margin: 0, color: "#666" }}>{userData.role}</p>
+            <h2 className="text-xl font-semibold">Welcome Back</h2>
+            <p className="text-gray-600">Staff Dashboard</p>
           </div>
         </div>
-        <div style={{ display: "flex", gap: "20px" }}>
+        <div className="flex gap-4">
           <button
-            onClick={() => navigate("/staff/settings")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              padding: "8px 16px",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-              backgroundColor: "white",
-              cursor: "pointer",
-            }}
+            onClick={() => navigate('/staff/settings')}
+            className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50"
           >
             <Settings size={16} />
             Settings
           </button>
           <button
             onClick={handleLogout}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              padding: "8px 16px",
-              backgroundColor: "#EF4444",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
+            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
           >
             <LogOut size={16} />
             Logout
@@ -102,123 +92,48 @@ const StaffDashboard = () => {
       </nav>
 
       {/* Quick Stats */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: "20px",
-          marginBottom: "30px",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "8px",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              marginBottom: "10px",
-            }}
-          >
-            <User color="#3B82F6" />
-            <h3>Assigned Clients</h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <User className="text-blue-500" />
+            <h3 className="font-medium">Assigned Clients</h3>
           </div>
-          <p style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>
-            {userData.assignedClients}
-          </p>
+          <p className="text-2xl font-bold">{dashboardData.assignedClients}</p>
         </div>
 
-        <div
-          style={{
-            backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "8px",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              marginBottom: "10px",
-            }}
-          >
-            <Calendar color="#10B981" />
-            <h3>Today's Shifts</h3>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <Calendar className="text-green-500" />
+            <h3 className="font-medium">Today's Shifts</h3>
           </div>
-          <p style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>
-            {userData.todayShifts}
-          </p>
+          <p className="text-2xl font-bold">{dashboardData.todayShifts}</p>
         </div>
 
-        <div
-          style={{
-            backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "8px",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              marginBottom: "10px",
-            }}
-          >
-            <FileText color="#6366F1" />
-            <h3>Pending Reports</h3>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <FileText className="text-indigo-500" />
+            <h3 className="font-medium">Pending Reports</h3>
           </div>
-          <p style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>
-            {userData.pendingReports}
-          </p>
+          <p className="text-2xl font-bold">{dashboardData.pendingReports}</p>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div style={{ marginBottom: "30px" }}>
-        <h2 style={{ marginBottom: "20px" }}>Quick Actions</h2>
-        <div style={{ display: "flex", gap: "20px" }}>
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+        <div className="flex gap-4">
           <button
-            onClick={() => navigate("/staff/time-log")}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#3B82F6",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-            }}
+            onClick={() => navigate('/staff/time-clock')}
+            className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
           >
-            <Clock size={16} />
+            <Clock size={20} />
             Log Time
           </button>
           <button
-            onClick={() => navigate("/staff/reports")}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#10B981",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-            }}
+            onClick={() => navigate('/staff/shift-report')}
+            className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600"
           >
-            <FileText size={16} />
+            <FileText size={20} />
             Submit Report
           </button>
         </div>
@@ -226,43 +141,38 @@ const StaffDashboard = () => {
 
       {/* Recent Shifts */}
       <div>
-        <h2 style={{ marginBottom: "20px" }}>Recent Shifts</h2>
-        <div
-          style={{
-            backgroundColor: "white",
-            borderRadius: "8px",
-            overflow: "hidden",
-          }}
-        >
-          {recentShifts.map((shift) => (
+        <h2 className="text-xl font-semibold mb-4">Recent Shifts</h2>
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          {recentShifts.map((shift, index) => (
             <div
               key={shift.id}
-              style={{
-                padding: "20px",
-                borderBottom: "1px solid #eee",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
+              className={`p-4 ${
+                index !== recentShifts.length - 1 ? "border-b" : ""
+              }`}
             >
-              <div>
-                <h3 style={{ margin: 0 }}>{shift.clientName}</h3>
-                <p style={{ margin: "5px 0", color: "#666" }}>{shift.date}</p>
-                <p style={{ margin: 0, color: "#666" }}>{shift.time}</p>
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-medium">{shift.clientName}</h3>
+                  <p className="text-gray-600">{new Date(shift.date).toLocaleDateString()}</p>
+                  <p className="text-gray-600">{shift.startTime} - {shift.endTime}</p>
+                </div>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm ${
+                    shift.status === "Completed"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-yellow-100 text-yellow-800"
+                  }`}
+                >
+                  {shift.status}
+                </span>
               </div>
-              <span
-                style={{
-                  padding: "5px 10px",
-                  borderRadius: "4px",
-                  backgroundColor:
-                    shift.status === "Completed" ? "#D1FAE5" : "#FEF3C7",
-                  color: shift.status === "Completed" ? "#059669" : "#D97706",
-                }}
-              >
-                {shift.status}
-              </span>
             </div>
           ))}
+          {recentShifts.length === 0 && (
+            <div className="p-6 text-center text-gray-500">
+              No recent shifts found
+            </div>
+          )}
         </div>
       </div>
     </div>
