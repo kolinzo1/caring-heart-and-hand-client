@@ -205,7 +205,7 @@ const StaffDashboard = () => {
             Log Time
           </button>
           <button
-            onClick={() => navigate("/staff/ShiftReport")}
+            onClick={() => navigate("/staff/report")}
             style={{
               padding: "10px 20px",
               backgroundColor: "#10B981",
