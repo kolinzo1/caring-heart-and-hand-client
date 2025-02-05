@@ -37,6 +37,11 @@ const TimeClockForm = () => {
     fetchClients();
   }, []);
 
+  useEffect(() => {
+    console.log('API URL:', process.env.REACT_APP_API_URL);
+    fetchClients();
+  }, []);
+
   const fetchClients = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/clients`, {
