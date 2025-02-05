@@ -16,7 +16,6 @@ import {
   SelectItem 
 } from "../../components/ui/select";
 import { Button } from "../../components/ui/button";
-import { Select } from "../../components/ui/select";
 import { Input } from "../../components/ui/input";
 import { Clock } from "lucide-react";
 
@@ -44,9 +43,13 @@ const TimeClockForm = () => {
 
   const fetchClients = async () => {
     try {
+      const token = localStorage.getItem('token');
+      console.log('Auth token:', token); // Check if token exists
+      
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/clients`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
       });
       
