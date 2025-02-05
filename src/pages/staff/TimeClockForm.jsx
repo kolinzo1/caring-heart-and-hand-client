@@ -45,13 +45,12 @@ const TimeClockForm = () => {
         },
       });
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch clients');
-      }
-
+      console.log('API Response:', response);
       const data = await response.json();
+      console.log('Clients data:', data);
       setClients(data);
     } catch (error) {
+      console.error('Fetch clients error:', error);
       addToast({
         title: "Error",
         description: "Failed to fetch clients",
