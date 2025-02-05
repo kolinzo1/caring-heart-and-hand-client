@@ -123,14 +123,14 @@ const StaffDashboard = () => {
         <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
         <div className="flex gap-4">
           <button
-            onClick={() => navigate('/staff/time-log')}
+            onClick={() => navigate('/staff/time-clock')}
             className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
           >
             <Clock size={20} />
             Log Time
           </button>
           <button
-            onClick={() => navigate('/staff/report')}
+            onClick={() => navigate('/staff/shift-report')}
             className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600"
           >
             <FileText size={20} />
