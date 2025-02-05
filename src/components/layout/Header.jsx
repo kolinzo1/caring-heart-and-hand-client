@@ -163,7 +163,7 @@ const Header = () => {
                         : "/staff/dashboard"
                     }
                     className="block py-2 text-base font-medium text-gray-600 hover:text-primary"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => setIsMenuOpen(true)}
                   >
                     Dashboard
                   </Link>
