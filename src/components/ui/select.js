@@ -2,6 +2,7 @@ import React from "react";
 import { cn } from "../../utils/cn";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown } from "lucide-react";
+import PropTypes from "prop-types";
 
 const Select = SelectPrimitive.Root;
 
@@ -21,6 +22,11 @@ const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) 
   </SelectPrimitive.Trigger>
 ));
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
+
+SelectTrigger.propTypes = {
+  className: PropTypes.string, // Validate className as a string
+  children: PropTypes.node, // Validate children as a React node
+};
 
 const SelectValue = SelectPrimitive.Value;
 
@@ -51,6 +57,11 @@ const SelectContent = React.forwardRef(({ className, children, position = "poppe
 ));
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 
+SelectContent.propTypes = {
+  className: PropTypes.string, // Validate className as a string
+  children: PropTypes.node, // Validate children as a React node
+};
+
 const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => (
   <SelectPrimitive.Item
     ref={ref}
@@ -69,5 +80,10 @@ const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => 
   </SelectPrimitive.Item>
 ));
 SelectItem.displayName = SelectPrimitive.Item.displayName;
+
+SelectItem.propTypes = {
+  className: PropTypes.string, // Validate className as a string
+  children: PropTypes.node, // Validate children as a React node
+};
 
 export { Select, SelectTrigger, SelectValue, SelectContent, SelectItem };
