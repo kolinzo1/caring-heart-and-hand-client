@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../hooks/useToast";
 import {
   Card,
@@ -12,10 +13,12 @@ import {
 import { Button } from "../../components/ui/button";
 import { Textarea } from "../../components/ui/textarea";
 import { Checkbox } from "../../components/ui/checkbox";
+import { Loader2 } from "lucide-react";
 
 const ShiftReport = () => {
   const { shiftId } = useParams();
   const navigate = useNavigate();
+  const { token } = useAuth();
   const { addToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [shift, setShift] = useState(null);
@@ -35,12 +38,21 @@ const ShiftReport = () => {
   });
 
   useEffect(() => {
+    if (!token) {
+      navigate('/login');
+      return;
+    }
     fetchShiftDetails();
-  }, [shiftId]);
+  }, [shiftId, token]);
 
   const fetchShiftDetails = async () => {
     try {
-      const response = await fetch(`/api/staff/shifts/${shiftId}`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/shifts/${shiftId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) throw new Error('Failed to fetch shift details');
       const data = await response.json();
       setShift(data);
     } catch (error) {
@@ -57,11 +69,16 @@ const ShiftReport = () => {
     setIsLoading(true);
 
     try {
-      await fetch(`/api/staff/shifts/${shiftId}/report`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/shifts/${shiftId}/report`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(formData),
       });
+
+      if (!response.ok) throw new Error('Failed to submit report');
 
       addToast({
         title: "Success",
@@ -81,13 +98,17 @@ const ShiftReport = () => {
     }
   };
 
+  if (!shift) {
+    return <div className="text-center py-8">Loading shift details...</div>;
+  }
+
   return (
     <div className="container mx-auto p-6 max-w-2xl">
       <Card>
         <CardHeader>
           <CardTitle>Shift Report</CardTitle>
           <CardDescription>
-            Please complete this report for your shift with {shift?.clientName}
+            Complete this report for your shift with {shift.clientName}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -95,27 +116,25 @@ const ShiftReport = () => {
             <div>
               <h3 className="font-medium mb-3">Tasks Completed</h3>
               <div className="grid grid-cols-2 gap-4">
-                {Object.entries(formData.tasksCompleted).map(
-                  ([task, checked]) => (
-                    <div key={task} className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={checked}
-                        onCheckedChange={(checked) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            tasksCompleted: {
-                              ...prev.tasksCompleted,
-                              [task]: checked,
-                            },
-                          }))
-                        }
-                      />
-                      <label className="text-sm">
-                        {task.charAt(0).toUpperCase() + task.slice(1)}
-                      </label>
-                    </div>
-                  )
-                )}
+                {Object.entries(formData.tasksCompleted).map(([task, checked]) => (
+                  <div key={task} className="flex items-center space-x-2">
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={(checked) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          tasksCompleted: {
+                            ...prev.tasksCompleted,
+                            [task]: checked,
+                          },
+                        }))
+                      }
+                    />
+                    <label className="text-sm">
+                      {task.charAt(0).toUpperCase() + task.slice(1)}
+                    </label>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -133,6 +152,7 @@ const ShiftReport = () => {
                 }
                 placeholder="Describe the client's general condition and mood"
                 rows={3}
+                required
               />
             </div>
 
@@ -189,8 +209,19 @@ const ShiftReport = () => {
           >
             Cancel
           </Button>
-          <Button type="submit" onClick={handleSubmit} disabled={isLoading}>
-            Submit Report
+          <Button 
+            onClick={handleSubmit} 
+            disabled={isLoading}
+            className="flex items-center gap-2"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              'Submit Report'
+            )}
           </Button>
         </CardFooter>
       </Card>

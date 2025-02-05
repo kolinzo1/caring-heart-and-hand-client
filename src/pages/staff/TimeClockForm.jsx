@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../hooks/useToast";
+import { useAuth } from "../../context/AuthContext";
 import {
   Card,
   CardHeader,
@@ -17,11 +18,13 @@ import {
 } from "../../components/ui/select";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
+import { Textarea } from "../../components/ui/textarea";
 import { Clock } from "lucide-react";
 
 const TimeClockForm = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
+  const { token } = useAuth();
   const [clients, setClients] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -30,28 +33,29 @@ const TimeClockForm = () => {
     startTime: "",
     endTime: "",
     notes: "",
+    serviceType: ""
   });
 
-  useEffect(() => {
-    fetchClients();
-  }, []);
+  const serviceTypes = [
+    "Personal Care",
+    "Companionship",
+    "Medication Reminder",
+    "Light Housekeeping",
+    "Meal Preparation",
+    "Transportation",
+    "Other",
+  ];
 
   useEffect(() => {
-    console.log('API URL:', process.env.REACT_APP_API_URL);
+    if (!token) {
+      navigate('/login');
+      return;
+    }
     fetchClients();
-  }, []);
+  }, [token, navigate]);
 
   const fetchClients = async () => {
     try {
-      const token = localStorage.getItem('token');
-      console.log('Using token:', token); // Debug log
-      
-      if (!token) {
-        console.log('No token found, redirecting to login');
-        navigate('/login');
-        return;
-      }
-  
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/clients`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -64,7 +68,6 @@ const TimeClockForm = () => {
       }
       
       const data = await response.json();
-      console.log('Clients data:', data);
       setClients(data);
     } catch (error) {
       console.error('Fetch clients error:', error);
@@ -100,7 +103,7 @@ const TimeClockForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.clientId || !formData.startTime || !formData.endTime) {
+    if (!formData.clientId || !formData.startTime || !formData.endTime || !formData.serviceType) {
       addToast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -115,7 +118,7 @@ const TimeClockForm = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -174,6 +177,25 @@ const TimeClockForm = () => {
             </div>
 
             <div>
+              <label className="block text-sm font-medium mb-2">Service Type *</label>
+              <Select
+                value={formData.serviceType}
+                onValueChange={(value) => setFormData({ ...formData, serviceType: value })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select service type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {serviceTypes.map((service) => (
+                    <SelectItem key={service} value={service}>
+                      {service}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
               <label className="block text-sm font-medium mb-2">Date *</label>
               <Input
                 type="date"
@@ -225,13 +247,13 @@ const TimeClockForm = () => {
 
             <div>
               <label className="block text-sm font-medium mb-2">Notes</label>
-              <textarea
+              <Textarea
                 value={formData.notes}
                 onChange={(e) =>
                   setFormData({ ...formData, notes: e.target.value })
                 }
-                className="w-full rounded-md border border-gray-300 p-2 min-h-[100px]"
                 placeholder="Add any notes about this shift..."
+                className="min-h-[100px]"
               />
             </div>
 
