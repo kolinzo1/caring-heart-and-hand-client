@@ -11,6 +11,7 @@ import {
   Settings,
 } from "lucide-react";
 
+
 const StaffDashboard = () => {
   const navigate = useNavigate();
   const { token, logout } = useAuth();
@@ -124,14 +125,20 @@ const StaffDashboard = () => {
         <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
         <div className="flex gap-4">
           <Button 
-            onClick={() => navigate('/staff/time-clock')}
+            onClick={() => {
+              console.log('Navigating to time-clock');
+              navigate('/staff/time-clock');
+            }}
             className="flex items-center gap-2"
           >
             <Clock size={20} />
             Log Time
           </Button>
           <Button
-            onClick={() => navigate('/staff/shift-history')}
+            onClick={() => {
+              console.log('Navigating to time-clock');
+              navigate('/staff/shift-history');
+            }}
             className="flex items-center gap-2"
           >
             <FileText size={20} />
