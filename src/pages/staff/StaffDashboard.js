@@ -22,6 +22,16 @@ const StaffDashboard = () => {
   });
   const [recentShifts, setRecentShifts] = useState([]);
 
+  const handleTimeLog = () => {
+    console.log('Navigating to /staff/time-clock');
+    navigate('/staff/time-clock');
+  };
+  
+  const handleSubmitReport = () => {
+    console.log('Navigating to /staff/shift-history');
+    navigate('/staff/shift-history');
+  };
+
   useEffect(() => {
     if (!token) {
       navigate('/login');
@@ -124,26 +134,8 @@ const StaffDashboard = () => {
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
         <div className="flex gap-4">
-          <Button 
-            onClick={() => {
-              console.log('Navigating to time-clock');
-              navigate('/staff/time-clock');
-            }}
-            className="flex items-center gap-2"
-          >
-            <Clock size={20} />
-            Log Time
-          </Button>
-          <Button
-            onClick={() => {
-              console.log('Navigating to time-clock');
-              navigate('/staff/shift-history');
-            }}
-            className="flex items-center gap-2"
-          >
-            <FileText size={20} />
-            Submit Report
-          </Button>
+          <Button onClick={handleTimeLog}>Log Time</Button>
+          <Button onClick={handleSubmitReport}>Submit Report</Button>
         </div>
       </div>
 
