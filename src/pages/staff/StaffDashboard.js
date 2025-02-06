@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Button } from "../../components/ui/button";
 import {
@@ -134,11 +134,7 @@ const StaffDashboard = () => {
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
         <div className="flex gap-4">
-        <Link to="/staff/time-clock"
-                      className="px-3 py-1 rounded-full text-sm bg-green-100 text-white-800"
-                    >
-                      Time Clock
-                    </Link>
+          <Button onClick={handleTimeLog}>Log Time</Button>
           <Button onClick={handleSubmitReport}>Submit Report</Button>
         </div>
       </div>
