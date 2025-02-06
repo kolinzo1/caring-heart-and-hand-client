@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { Button } from "../../components/ui/button";
 import {
   Clock,
   Calendar,
@@ -9,6 +10,7 @@ import {
   User,
   Settings,
 } from "lucide-react";
+
 
 const StaffDashboard = () => {
   const navigate = useNavigate();
@@ -19,6 +21,16 @@ const StaffDashboard = () => {
     pendingReports: 0
   });
   const [recentShifts, setRecentShifts] = useState([]);
+
+  const handleTimeLog = () => {
+    console.log('Navigating to /staff/time-clock');
+    navigate('/staff/time-clock');
+  };
+  
+  const handleSubmitReport = () => {
+    console.log('Navigating to /staff/shift-history');
+    navigate('/staff/shift-history');
+  };
 
   useEffect(() => {
     if (!token) {
@@ -122,20 +134,8 @@ const StaffDashboard = () => {
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
         <div className="flex gap-4">
-          <button
-            onClick={() => navigate('/staff/time-clock')}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-          >
-            <Clock size={20} />
-            Log Time
-          </button>
-          <button
-            onClick={() => navigate('/staff/shift-report')}
-            className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600"
-          >
-            <FileText size={20} />
-            Submit Report
-          </button>
+          <Button onClick={handleTimeLog}>Log Time</Button>
+          <Button onClick={handleSubmitReport}>Submit Report</Button>
         </div>
       </div>
 
