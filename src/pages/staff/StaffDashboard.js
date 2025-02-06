@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { Button } from "../../components/ui/button";
 import {
   Clock,
   Calendar,
@@ -122,20 +123,20 @@ const StaffDashboard = () => {
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
         <div className="flex gap-4">
-          <button
+          <Button 
             onClick={() => navigate('/staff/time-clock')}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            className="flex items-center gap-2"
           >
             <Clock size={20} />
             Log Time
-          </button>
-          <button
-            onClick={() => navigate('/staff/shift-report')}
-            className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600"
+          </Button>
+          <Button
+            onClick={() => navigate('/staff/shift-history')}
+            className="flex items-center gap-2"
           >
             <FileText size={20} />
             Submit Report
-          </button>
+          </Button>
         </div>
       </div>
 
