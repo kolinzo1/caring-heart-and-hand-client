@@ -114,7 +114,7 @@ const TimeClockForm = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/time-logs`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/time-clock`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
