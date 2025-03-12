@@ -60,24 +60,43 @@ const ShiftHistory = () => {
   const fetchShifts = async () => {
     setIsLoading(true);
     try {
+      console.log('Fetching shifts with token:', token); // Log token being used
+      
       const queryParams = new URLSearchParams({
         client: filters.client,
         startDate: filters.startDate,
         endDate: filters.endDate,
         status: filters.status,
       }).toString();
-
+  
+      console.log('Making request to:', `${process.env.REACT_APP_API_URL}/api/shifts?${queryParams}`);
+      
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/shifts?${queryParams}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch shifts');
+      }
+  
       const data = await response.json();
+      console.log('Received shifts data:', data); // Log received data
+  
+      if (!Array.isArray(data)) {
+        console.error('Received non-array data:', data);
+        throw new Error('Invalid data format received from server');
+      }
+  
       setShifts(data);
     } catch (error) {
+      console.error('Full error details:', error);
       addToast({
         title: "Error",
-        description: "Failed to fetch shifts",
+        description: error.message || "Failed to fetch shifts",
         variant: "error",
       });
     } finally {
@@ -232,7 +251,7 @@ const ShiftHistory = () => {
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-semibold">{`${shift.client.first_name} ${shift.client.last_name}`}</h3>
+                      <h3 className="font-semibold">{`${shift.first_name} ${shift.last_name}`}</h3>
                       <div className="text-sm text-gray-500 space-y-1">
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4" />
@@ -240,7 +259,7 @@ const ShiftHistory = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <Clock className="w-4 h-4" />
-                          {`${shift.startTime} - ${shift.endTime}`}
+                          {`${shift.start_time} - ${shift.end_time}`}
                         </div>
                       </div>
                     </div>
@@ -264,22 +283,22 @@ const ShiftHistory = () => {
       </Card>
 
       <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
-        <DialogContent>
+        <DialogContent className="bg-white text-black">  {/* Add these classes */}
           <DialogHeader>
-            <DialogTitle>Shift Report</DialogTitle>
+            <DialogTitle className="text-lg font-semibold">Shift Report</DialogTitle>
           </DialogHeader>
           {selectedShift && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-sm text-gray-500">Client</div>
-                  <div className="font-medium">
-                    {`${selectedShift.client.first_name} ${selectedShift.client.last_name}`}
+                  <div className="font-medium text-black">  {/* Add text-black */}
+                    {`${selectedShift.first_name} ${selectedShift.last_name}`}
                   </div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">Date</div>
-                  <div className="font-medium">
+                  <div className="font-medium text-black">  {/* Add text-black */}
                     {new Date(selectedShift.date).toLocaleDateString()}
                   </div>
                 </div>
@@ -287,12 +306,16 @@ const ShiftHistory = () => {
 
               <div>
                 <div className="text-sm text-gray-500">Service Type</div>
-                <div className="font-medium">{selectedShift.serviceType}</div>
+                <div className="font-medium text-black">  {/* Add text-black */}
+                  {selectedShift.service_type}
+                </div>
               </div>
 
               <div>
                 <div className="text-sm text-gray-500">Notes</div>
-                <div className="font-medium">{selectedShift.notes}</div>
+                <div className="font-medium text-black">  {/* Add text-black */}
+                  {selectedShift.notes}
+                </div>
               </div>
             </div>
           )}

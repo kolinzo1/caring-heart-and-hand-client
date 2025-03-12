@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { teamService } from "../services/api/teamService";
+import { Button } from "../components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,7 +9,7 @@ import {
   CardDescription,
   CardFooter,
 } from "../components/ui/card";
-import { Button } from "../components/ui/button";
+import JobApplicationDialog from '../components/JobApplicationDialog';
 import {
   Briefcase,
   Clock,
@@ -21,6 +23,9 @@ import {
 
 const CareersPage = () => {
   const [selectedDepartment, setSelectedDepartment] = useState("all");
+  const [openPositions, setOpenPositions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const departments = [
     "All",
@@ -30,31 +35,22 @@ const CareersPage = () => {
     "Management",
   ];
 
-  const openPositions = [
-    {
-      id: 1,
-      title: "Senior Care Provider",
-      department: "Care Providers",
-      type: "Full-time",
-      location: "Chattanooga, TN",
-      description:
-        "We're seeking experienced care providers to join our growing team...",
-      requirements: [
-        "2+ years of caregiving experience",
-        "CPR and First Aid certification",
-        "Valid driver's license",
-        "Reliable transportation",
-      ],
-      benefits: [
-        "Competitive pay",
-        "Health insurance",
-        "Paid time off",
-        "Flexible scheduling",
-        "Career advancement opportunities",
-      ],
-    },
-    // Add more positions
-  ];
+  useEffect(() => {
+    const loadPositions = async () => {
+      try {
+        setLoading(true);
+        const positions = await teamService.getOpenPositions();
+        setOpenPositions(positions);
+      } catch (err) {
+        console.error("Failed to fetch positions:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPositions();
+  }, []);
 
   const benefits = [
     {
@@ -82,8 +78,19 @@ const CareersPage = () => {
 
   const filteredPositions = openPositions.filter(
     (position) =>
-      selectedDepartment === "all" || position.department === selectedDepartment
+      position.is_active && 
+      (selectedDepartment === "all" || 
+       position.department.toLowerCase() === selectedDepartment)
   );
+
+  const handleApplicationSubmit = async (applicationData) => {
+    try {
+      await teamService.submitApplication(applicationData);
+      // You might want to show a success message here
+    } catch (error) {
+      throw new Error('Failed to submit application. Please try again.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -161,64 +168,79 @@ const CareersPage = () => {
           </div>
 
           {/* Positions Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredPositions.map((position) => (
-              <Card
-                key={position.id}
-                className="hover:shadow-lg transition-shadow"
-              >
-                <CardHeader>
-                  <CardTitle>{position.title}</CardTitle>
-                  <CardDescription>
-                    <div className="flex gap-4 mt-2">
-                      <span className="flex items-center text-sm text-gray-600">
-                        <Briefcase className="w-4 h-4 mr-1" />
-                        {position.type}
-                      </span>
-                      <span className="flex items-center text-sm text-gray-600">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {position.location}
-                      </span>
-                    </div>
-                  </CardDescription>
-                </CardHeader>
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            </div>
+          ) : filteredPositions.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No open positions available in this department at the moment.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredPositions.map((position) => (
+                <Card
+                  key={position.id}
+                  className="hover:shadow-lg transition-shadow"
+                >
+                  <CardHeader>
+                    <CardTitle>{position.title}</CardTitle>
+                    <CardDescription>
+                      <div className="flex gap-4 mt-2">
+                        <span className="flex items-center text-sm text-gray-600">
+                          <Briefcase className="w-4 h-4 mr-1" />
+                          {position.employment_type}
+                        </span>
+                        <span className="flex items-center text-sm text-gray-600">
+                          <MapPin className="w-4 h-4 mr-1" />
+                          {position.location}
+                        </span>
+                      </div>
+                    </CardDescription>
+                  </CardHeader>
 
-                <CardContent>
-                  <p className="mb-4">{position.description}</p>
+                  <CardContent>
+                    <p className="mb-4">{position.description}</p>
 
-                  <div className="mb-4">
-                    <h4 className="font-semibold mb-2">Requirements:</h4>
-                    <ul className="list-disc list-inside text-gray-600">
-                      {position.requirements.map((req, index) => (
-                        <li key={index}>{req}</li>
-                      ))}
-                    </ul>
-                  </div>
+                    {position.requirements?.length > 0 && (
+                      <div className="mb-4">
+                        <h4 className="font-semibold mb-2">Requirements:</h4>
+                        <ul className="list-disc list-inside text-gray-600">
+                          {position.requirements.map((req, index) => (
+                            <li key={index}>{req}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
 
-                  <div>
-                    <h4 className="font-semibold mb-2">Benefits:</h4>
-                    <ul className="list-disc list-inside text-gray-600">
-                      {position.benefits.map((benefit, index) => (
-                        <li key={index}>{benefit}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </CardContent>
+                    {position.benefits?.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-2">Benefits:</h4>
+                        <ul className="list-disc list-inside text-gray-600">
+                          {position.benefits.map((benefit, index) => (
+                            <li key={index}>{benefit}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </CardContent>
 
-                <CardFooter>
-                  <Button
-                    className="w-full flex items-center justify-center"
-                    onClick={() =>
-                      (window.location.href = `/careers/apply/${position.id}`)
-                    }
-                  >
-                    Apply Now
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+                  <CardFooter>
+                    <JobApplicationDialog
+                      position={position}
+                      onSubmit={handleApplicationSubmit}
+                      trigger={
+                        <Button className="w-full flex items-center justify-center">
+                          Apply Now
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      }
+                    />
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

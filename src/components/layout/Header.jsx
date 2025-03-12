@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, User } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
@@ -7,13 +7,28 @@ import { Button } from "../ui/button";
 const Header = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isPortalOpen, setIsPortalOpen] = useState(false);
+  const portalRef = useRef(null);
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
+
+  // Close portal dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (portalRef.current && !portalRef.current.contains(event.target)) {
+        setIsPortalOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
     setIsMenuOpen(false);
+    setIsPortalOpen(false);
   };
 
   const navigation = [
@@ -29,7 +44,7 @@ const Header = () => {
       <nav className="container mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
+          <Link to="/" className="flex items-center">          
             <span className="text-xl sm:text-2xl font-bold text-primary">
               Caring Heart & Hand
             </span>
@@ -61,52 +76,63 @@ const Header = () => {
                 Request Care
               </Link>
               {isAuthenticated ? (
-                <div className="relative group">
-                  <Button variant="outline" className="flex items-center gap-2">
+                <div className="relative" ref={portalRef}>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2"
+                    onClick={() => setIsPortalOpen(!isPortalOpen)}
+                  >
                     <User className="w-4 h-4" />
                     Portal
                   </Button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block">
-                    {user?.role === "admin" ? (
+                  {isPortalOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                      {user?.role === "admin" ? (
+                        <Link
+                          to="/admin/dashboard"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsPortalOpen(false)}
+                        >
+                          Admin Dashboard
+                        </Link>
+                      ) : (
+                        <Link
+                          to="/staff/dashboard"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsPortalOpen(false)}
+                        >
+                          Staff Dashboard
+                        </Link>
+                      )}
                       <Link
-                        to="/admin/dashboard"
+                        to="/staff/time-clock"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsPortalOpen(false)}
                       >
-                        Admin Dashboard
+                        Time Clock
                       </Link>
-                    ) : (
                       <Link
-                        to="/staff/dashboard"
+                        to="/staff/shift-history"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsPortalOpen(false)}
                       >
-                        Staff Dashboard
+                        Shift History
                       </Link>
-                    )}
-                    <Link
-                      to="/staff/time-clock"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Time Clock
-                    </Link>
-                    <Link
-                      to="/staff/shift-history"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Shift History
-                    </Link>
-                    <Link
-                      to="/staff/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Profile
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                    >
-                      Logout
-                    </button>
-                  </div>
+                      <Link
+                        to="/staff/profile"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsPortalOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <Link
@@ -163,7 +189,7 @@ const Header = () => {
                         : "/staff/dashboard"
                     }
                     className="block py-2 text-base font-medium text-gray-600 hover:text-primary"
-                    onClick={() => setIsMenuOpen(true)}
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     Dashboard
                   </Link>

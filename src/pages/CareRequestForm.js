@@ -11,7 +11,13 @@ import {
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
-import { Select } from "../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 import {
   Heart,
   Calendar,
@@ -150,14 +156,40 @@ const CareRequestForm = () => {
     e.preventDefault();
     if (validateStep(step)) {
       try {
-        // Here you would typically send the data to your backend
-        // await submitFormData(formData);
-
+        console.log("Submitting form data:", formData);
+        
+        // Get the base URL from environment or use a default
+        const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
+        const url = `${API_URL}/api/care-requests`;
+        
+        console.log("Sending request to:", url);
+        
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+          credentials: "include", // Include cookies if using sessions
+        });
+        
+        console.log("Response status:", response.status);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error("Error response:", errorData);
+          throw new Error(`Failed to submit: ${response.status} ${errorData.message || ''}`);
+        }
+        
+        const responseData = await response.json();
+        console.log("Success response:", responseData);
+        
         // Navigate to confirmation page with form data
         navigate("/request-confirmation", { state: { formData } });
       } catch (error) {
         console.error("Error submitting form:", error);
-        // Handle error appropriately
+        // Add visual feedback for the user
+        alert("Error submitting your request. Please try again or contact support.");
       }
     }
   };
@@ -391,17 +423,21 @@ const CareRequestForm = () => {
                       Type of Care Needed *
                     </label>
                     <Select
-                      name="careType"
                       value={formData.careType}
-                      onChange={handleChange}
-                      className={errors.careType ? "border-red-500" : ""}
+                      onValueChange={(value) => 
+                        handleChange({ target: { name: "careType", value } })
+                      }
                     >
-                      <option value="">Select care type</option>
-                      {careTypes.map((type) => (
-                        <option key={type} value={type}>
-                          {type}
-                        </option>
-                      ))}
+                      <SelectTrigger className={errors.careType ? "border-red-500" : ""}>
+                        <SelectValue placeholder="Select care type" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-100">
+                        {careTypes.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
                     </Select>
                     {errors.careType && (
                       <p className="text-red-500 text-sm mt-1">
@@ -438,17 +474,21 @@ const CareRequestForm = () => {
                       Care Frequency *
                     </label>
                     <Select
-                      name="frequency"
                       value={formData.frequency}
-                      onChange={handleChange}
-                      className={errors.frequency ? "border-red-500" : ""}
+                      onValueChange={(value) => 
+                        handleChange({ target: { name: "frequency", value } })
+                      }
                     >
-                      <option value="">Select frequency</option>
-                      {frequencies.map((freq) => (
-                        <option key={freq} value={freq}>
-                          {freq}
-                        </option>
-                      ))}
+                      <SelectTrigger className={errors.frequency ? "border-red-500" : ""}>
+                        <SelectValue placeholder="Select frequency" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-100">
+                        {frequencies.map((freq) => (
+                          <SelectItem key={freq} value={freq}>
+                            {freq}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
                     </Select>
                     {errors.frequency && (
                       <p className="text-red-500 text-sm mt-1">
@@ -464,17 +504,21 @@ const CareRequestForm = () => {
                     <div className="relative">
                       <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                       <Select
-                        name="preferredTime"
                         value={formData.preferredTime}
-                        onChange={handleChange}
-                        className="pl-10"
+                        onValueChange={(value) => 
+                          handleChange({ target: { name: "preferredTime", value } })
+                        }
                       >
-                        <option value="">Select preferred time</option>
-                        {timeSlots.map((slot) => (
-                          <option key={slot} value={slot}>
-                            {slot}
-                          </option>
-                        ))}
+                        <SelectTrigger className="pl-10">
+                          <SelectValue placeholder="Select preferred time" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-100">
+                          {timeSlots.map((slot) => (
+                            <SelectItem key={slot} value={slot}>
+                              {slot}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
                       </Select>
                     </div>
                   </div>
@@ -539,17 +583,21 @@ const CareRequestForm = () => {
                       Mobility Status *
                     </label>
                     <Select
-                      name="mobilityStatus"
                       value={formData.mobilityStatus}
-                      onChange={handleChange}
-                      className={errors.mobilityStatus ? "border-red-500" : ""}
+                      onValueChange={(value) => 
+                        handleChange({ target: { name: "mobilityStatus", value } })
+                      }
                     >
-                      <option value="">Select mobility status</option>
-                      {mobilityOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
+                      <SelectTrigger className={errors.mobilityStatus ? "border-red-500" : ""}>
+                        <SelectValue placeholder="Select mobility status" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-200">
+                        {mobilityOptions.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
                     </Select>
                     {errors.mobilityStatus && (
                       <p className="text-red-500 text-sm mt-1">

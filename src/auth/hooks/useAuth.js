@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setCredentials,
+  loginSuccess,
   logout,
   setError,
   setLoading,
@@ -18,7 +18,7 @@ export const useAuth = () => {
         dispatch(setLoading(true));
         const userData = await authService.validateToken();
         if (userData) {
-          dispatch(setCredentials(userData));
+          dispatch(loginSuccess(userData));
         } else {
           dispatch(logout());
         }
@@ -38,7 +38,7 @@ export const useAuth = () => {
     try {
       dispatch(setLoading(true));
       const userData = await authService.login(credentials);
-      dispatch(setCredentials(userData));
+      dispatch(loginSuccess(userData));
       return userData;
     } catch (error) {
       dispatch(setError(error.message));

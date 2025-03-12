@@ -55,30 +55,44 @@ export const teamService = {
 
   // Job Applications
   async submitApplication(data) {
-    const formData = new FormData();
-    Object.keys(data).forEach((key) => {
-      if (data[key] instanceof File) {
-        formData.append(key, data[key]);
-      } else {
-        formData.append(key, JSON.stringify(data[key]));
+    try {
+      const formData = new FormData();
+      
+      // Add all text fields
+      formData.append('first_name', data.first_name);
+      formData.append('last_name', data.last_name);
+      formData.append('email', data.email);
+      formData.append('phone', data.phone);
+      formData.append('cover_letter', data.cover_letter);
+      formData.append('position_id', data.position_id);
+      
+      // Add the resume file
+      if (data.resume) {
+        formData.append('resume', data.resume);
       }
-    });
-
-    const response = await api.post("/careers/apply", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    return response.data;
+  
+      console.log('Submitting application:', Object.fromEntries(formData));
+  
+      const response = await api.post("/api/careers/apply", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Application submission error:', error);
+      throw error;
+    }
   },
 
   async getApplications(filters = {}) {
-    const response = await api.get("/careers/applications", {
+    const response = await api.get("/api/careers/applications", {
       params: filters,
-    });
-    return response.data;
+  });
+  return response.data;
   },
 
+  
   async updateApplicationStatus(id, status) {
     const response = await api.put(`/careers/applications/${id}/status`, {
       status,
@@ -106,4 +120,18 @@ export const teamService = {
     const response = await api.delete(`/careers/positions/${id}`);
     return response.data;
   },
+
+  async downloadResume(id) {
+    console.log('teamService: Downloading resume for id:', id);
+    try {
+      const response = await api.get(`/api/careers/applications/download/${id}`, {
+        responseType: 'blob',
+      });
+      console.log('teamService: Download successful');
+      return response;
+    } catch (error) {
+      console.error('teamService: Download failed:', error);
+      throw error;
+    }
+  }
 };

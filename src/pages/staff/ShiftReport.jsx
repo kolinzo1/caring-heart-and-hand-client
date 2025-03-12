@@ -16,7 +16,9 @@ import { Checkbox } from "../../components/ui/checkbox";
 import { Loader2 } from "lucide-react";
 
 const ShiftReport = () => {
+  console.log('ShiftReport component rendering'); // Add this line
   const { shiftId } = useParams();
+  console.log('ShiftReport - Shift ID:', shiftId); // Keep this existing log
   const navigate = useNavigate();
   const { token } = useAuth();
   const { addToast } = useToast();
@@ -42,34 +44,43 @@ const ShiftReport = () => {
       navigate('/login');
       return;
     }
-    fetchShiftDetails();
-  }, [shiftId, token]);
+    
+    const fetchShiftDetails = async () => {
+      try {
+        console.log('Fetching shift details for ID:', shiftId);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/time-logs/${shiftId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
 
-  const fetchShiftDetails = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/shifts/${shiftId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+        if (!response.ok) {
+          throw new Error('Failed to fetch shift details');
         }
-      });
-      if (!response.ok) throw new Error('Failed to fetch shift details');
-      const data = await response.json();
-      setShift(data);
-    } catch (error) {
-      addToast({
-        title: "Error",
-        description: "Failed to fetch shift details",
-        variant: "error",
-      });
-    }
-  };
+
+        const data = await response.json();
+        console.log('Received shift data:', data);
+        setShift(data);
+      } catch (error) {
+        console.error('Error fetching shift details:', error);
+        addToast({
+          title: "Error",
+          description: "Failed to fetch shift details",
+          variant: "error",
+        });
+      }
+    };
+  
+    fetchShiftDetails();
+  }, [shiftId, token, navigate, addToast]
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/shifts/${shiftId}/report`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/time-logs/${shiftId}/report`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

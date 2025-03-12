@@ -4,95 +4,84 @@ import { useNavigate } from "react-router-dom";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
+ const [user, setUser] = useState(null);
+ const [isLoading, setIsLoading] = useState(true);
+ const navigate = useNavigate();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
+ useEffect(() => {
+   checkAuth();
+ }, []);
 
-  const checkAuth = () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        // Decode the mock token
-        const userData = JSON.parse(atob(token));
-        setUser(userData);
-      } catch (error) {
-        console.error("Invalid token:", error);
-        localStorage.removeItem("token");
-      }
-    }
-    setIsLoading(false);
-  };
+ const checkAuth = () => {
+   const token = localStorage.getItem("token");
+   if (token) {
+     try {
+       const userData = JSON.parse(atob(token.split('.')[1]));
+       setUser(userData);
+     } catch (error) {
+       console.error("Invalid token:", error);
+       localStorage.removeItem("token");
+     }
+   }
+   setIsLoading(false);
+ };
 
-  const login = async (credentials) => {
-    // Mock credentials for testing
-    const mockUsers = {
-      "staff@example.com": {
-        password: "staffpass123",
-        role: "staff",
-        name: "John Staff",
+ const login = async (credentials) => {
+  try {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      "admin@example.com": {
-        password: "adminpass123",
-        role: "admin",
-        name: "Jane Admin",
-      },
-    };
+      body: JSON.stringify(credentials)
+    });
 
-    const user = mockUsers[credentials.email];
+    const data = await response.json();
 
-    if (user && user.password === credentials.password) {
-      // Create mock token
-      const mockToken = btoa(
-        JSON.stringify({
-          email: credentials.email,
-          role: user.role,
-          name: user.name,
-        })
-      );
-
-      // Store token and user data
-      localStorage.setItem("token", mockToken);
-      setUser({
-        email: credentials.email,
-        role: user.role,
-        name: user.name,
-      });
-
-      // Return success
-      return { success: true, role: user.role };
-    } else {
-      throw new Error("Invalid credentials");
+    if (!response.ok) {
+      throw new Error(data.message || 'Login failed');
     }
-  };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-    navigate("/login");
-  };
-
-  if (isLoading) {
-    return <div>Loading...</div>;
+    localStorage.setItem('token', data.token);
+    
+    // Set user data from the response
+    const userData = data.user;
+    setUser(userData);
+    
+    return { success: true, role: userData.role };
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
   }
+};
 
-  const value = {
-    user,
-    isAuthenticated: !!user,
-    login,
-    logout,
-  };
+ const logout = () => {
+   localStorage.removeItem("token");
+   setUser(null);
+   navigate("/login");
+ };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+ const value = {
+   user,
+   isAuthenticated: !!user,
+   login,
+   logout,
+   token: localStorage.getItem("token")
+ };
+
+ if (isLoading) {
+   return <div>Loading...</div>;
+ }
+
+ return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+ const context = useContext(AuthContext);
+ if (!context) {
+   throw new Error("useAuth must be used within an AuthProvider");
+ }
+ return context;
 };
+
+export default AuthContext;

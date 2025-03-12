@@ -9,7 +9,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Company Info */}
           <div>
-            <h3 className="text-lg font-bold mb-4">Caring Heart & Hand</h3>
+            <h3 className="text-lg font-bold mb-4">Caring Heart & Hand LLC</h3>
             <p className="text-gray-400 mb-4">
               Professional and compassionate home care services for your loved
               ones.
@@ -101,12 +101,14 @@ const Footer = () => {
                   href="mailto:admin@caringheartandhand.com"
                   className="text-gray-400 hover:text-white"
                 >
-                  admin@caringheartandhand.com
+                  admin@caringheartandhand.org
                 </a>
               </li>
               <li className="flex items-center">
                 <MapPin className="w-5 h-5 mr-2" />
-                <span className="text-gray-400">125 Business Address</span>
+                <span className="text-gray-400">
+                  12135 Evergreen Terrace Lane<br />Knoxville TN 37832
+                </span>
               </li>
             </ul>
           </div>

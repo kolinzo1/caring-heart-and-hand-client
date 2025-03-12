@@ -313,15 +313,15 @@ const AboutPage = () => {
           </p>
           <div className="flex justify-center gap-4">
             <Button
+              variant="secondary"              
               onClick={() => navigate("/contact")}
-              className="bg-white text-primary hover:bg-gray-100"
             >
               Contact Us
             </Button>
             <Button
               onClick={() => navigate("/careers")}
               variant="outline"
-              className="border-white text-white hover:bg-white/10"
+              className="bg-blue border-white text-primary hover:bg-gray-100"
             >
               Join Our Team
             </Button>

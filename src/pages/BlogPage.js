@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useToast } from "../hooks/useToast";
 import { Skeleton } from "../components/ui/LoadingStates/Skeleton";
+import BlogPostDialog from '../components/BlogPostDialog';
+import api from "../lib/axios";
 import {
   Card,
   CardHeader,
@@ -30,54 +32,33 @@ const BlogPage = () => {
     setError(null);
 
     try {
-      // Simulate API call with timeout
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log('Fetching posts...');
+      const response = await api.get('/api/blog', {
+        params: {
+          page: currentPage,
+          limit: POSTS_PER_PAGE
+        }
+      });
 
-      // Mock data - replace with actual API call
-      const mockPosts = [
-        {
-          id: 1,
-          title: "Understanding Home Care Services",
-          excerpt:
-            "Learn about the different types of home care services and how they can benefit you or your loved ones.",
-          date: "January 15, 2024",
-          category: "Care Guide",
-          readTime: "5 min read",
-        },
-        {
-          id: 2,
-          title: "Tips for Choosing a Home Care Provider",
-          excerpt:
-            "Important factors to consider when selecting a home care service provider for your family member.",
-          date: "January 10, 2024",
-          category: "Advice",
-          readTime: "4 min read",
-        },
-        {
-          id: 3,
-          title: "The Benefits of Respite Care",
-          excerpt:
-            "How respite care can support both caregivers and care recipients in maintaining a healthy balance.",
-          date: "January 5, 2024",
-          category: "Care Tips",
-          readTime: "6 min read",
-        },
-        // Add more mock posts here
-      ];
+      console.log('Posts response:', response.data);
 
-      setPosts(mockPosts);
-      setTotalPages(Math.ceil(mockPosts.length / POSTS_PER_PAGE));
+      if (response.data && response.data.posts) {
+        setPosts(response.data.posts);
+        setTotalPages(response.data.totalPages);
+      }
     } catch (error) {
+      console.error('Error fetching posts:', error);
       setError("Failed to fetch blog posts. Please try again later.");
       addToast({
         title: "Error",
         description: "Failed to load blog posts. Please refresh the page.",
-        variant: "error",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -150,26 +131,25 @@ const BlogPage = () => {
                     >
                       {post.category}
                     </span>
-                    <span className="text-sm text-gray-500">
-                      {post.readTime}
-                    </span>
                   </div>
-                  <h2 className="text-xl font-semibold mb-2 hover:text-primary transition-colors">
-                    <Link to={`/blog/${post.id}`}>{post.title}</Link>
-                  </h2>
-                  <p className="text-sm text-gray-500">{post.date}</p>
+                  <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
+                  <p className="text-sm text-gray-500">
+                    {new Date(post.created_at).toLocaleDateString()}
+                  </p>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">{post.excerpt}</p>
                 </CardContent>
                 <CardFooter className="mt-auto">
-                  <Link
-                    to={`/blog/${post.id}`}
-                    className="text-primary hover:text-primary/80 font-medium inline-flex items-center"
-                  >
-                    Read more
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Link>
+                  <BlogPostDialog 
+                    post={post}
+                    trigger={
+                      <Button variant="link" className="flex items-center text-primary">
+                        Read more
+                        <ChevronRight className="w-4 h-4 ml-1" />
+                      </Button>
+                    }
+                  />
                 </CardFooter>
               </Card>
             ))}

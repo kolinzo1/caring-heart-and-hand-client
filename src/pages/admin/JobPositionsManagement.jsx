@@ -11,7 +11,13 @@ import {
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
-import { Select } from "../../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -31,6 +37,7 @@ import {
 } from "lucide-react";
 
 const JobPositionsManagement = () => {
+  console.log('JobPositionsManagement rendering');
   const { addToast } = useToast();
   const [positions, setPositions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -262,7 +269,7 @@ const JobPositionsManagement = () => {
 
       {/* Add/Edit Position Modal */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] bg-gray-200">
           <DialogHeader>
             <DialogTitle>
               {editingPosition ? "Edit Position" : "Add New Position"}
@@ -288,17 +295,20 @@ const JobPositionsManagement = () => {
                 </label>
                 <Select
                   value={formData.department}
-                  onChange={(e) =>
-                    setFormData({ ...formData, department: e.target.value })
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, department: value })
                   }
-                  required
                 >
-                  <option value="">Select Department</option>
-                  {departments.map((dept) => (
-                    <option key={dept} value={dept}>
-                      {dept}
-                    </option>
-                  ))}
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Select Department" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {departments.map((dept) => (
+                      <SelectItem key={dept} value={dept}>
+                        {dept}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
 
@@ -308,17 +318,20 @@ const JobPositionsManagement = () => {
                 </label>
                 <Select
                   value={formData.employmentType}
-                  onChange={(e) =>
-                    setFormData({ ...formData, employmentType: e.target.value })
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, employmentType: value })
                   }
-                  required
                 >
-                  <option value="">Select Type</option>
-                  {employmentTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Select Type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {employmentTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
             </div>

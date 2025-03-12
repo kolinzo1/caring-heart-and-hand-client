@@ -37,9 +37,23 @@ const authSlice = createSlice({
       localStorage.removeItem("token");
       localStorage.removeItem("userRole");
     },
+    clearCredentials: (state) => {
+      state.user = null;
+      state.token = null;
+    },
   },
 });
 
-export const { setLoading, setError, loginSuccess, logout } = authSlice.actions;
+export const { 
+  setLoading, 
+  setError, 
+  loginSuccess, 
+  logout,
+  clearCredentials 
+} = authSlice.actions;
 
 export default authSlice.reducer;
+
+export const selectCurrentUser = (state) => state.auth.user;
+export const selectCurrentToken = (state) => state.auth.token;
+export const selectUserRole = (state) => state.auth.userRole;

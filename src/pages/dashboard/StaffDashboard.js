@@ -27,11 +27,12 @@ const StaffDashboard = () => {
     navigate('/staff/time-clock');
   };
   
-  const handleSubmitReport = () => {
-    console.log('Navigating to /staff/shift-history');
-    navigate('/staff/shift-history');
+  
+  const handleSubmitReport = (shiftId) => {
+    console.log('Navigating to shift report with ID:', shiftId);
+    navigate(`/staff/shift-report/${shiftId}`);
   };
-
+  
   useEffect(() => {
     if (!token) {
       navigate('/login');
@@ -63,6 +64,7 @@ const StaffDashboard = () => {
         }
       });
       const data = await response.json();
+      console.log('Fetched shifts:', data); // Debug log
       setRecentShifts(data);
     } catch (error) {
       console.error('Error fetching shifts:', error);
@@ -135,7 +137,16 @@ const StaffDashboard = () => {
         <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
         <div className="flex gap-4">
           <Button onClick={handleTimeLog}>Log Time</Button>
-          <Button onClick={handleSubmitReport}>Submit Report</Button>
+          <Button onClick={() => navigate('/staff/shift-history')}>View All Shifts</Button>
+          {/* Show shifts needing reports */}
+          {recentShifts.filter(shift => !shift.hasReport).map(shift => (
+            <Button 
+              key={shift.id} 
+              onClick={() => handleSubmitReport(shift.id)}
+            >
+              Submit Report for {shift.clientName}
+            </Button>
+          ))}
         </div>
       </div>
 
@@ -143,19 +154,20 @@ const StaffDashboard = () => {
       <div>
         <h2 className="text-xl font-semibold mb-4">Recent Shifts</h2>
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          {recentShifts.map((shift, index) => (
-            <div
-              key={shift.id}
-              className={`p-4 ${
-                index !== recentShifts.length - 1 ? "border-b" : ""
-              }`}
-            >
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="font-medium">{shift.clientName}</h3>
-                  <p className="text-gray-600">{new Date(shift.date).toLocaleDateString()}</p>
-                  <p className="text-gray-600">{shift.startTime} - {shift.endTime}</p>
-                </div>
+        {recentShifts.map((shift, index) => (
+          <div
+            key={shift.id}
+            className={`p-4 ${
+              index !== recentShifts.length - 1 ? "border-b" : ""
+            }`}
+          >
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="font-medium">{`${shift.first_name} ${shift.last_name}`}</h3>
+                <p className="text-gray-600">{new Date(shift.date).toLocaleDateString()}</p>
+                <p className="text-gray-600">{shift.start_time} - {shift.end_time}</p>
+              </div>
+              <div className="flex gap-2">
                 <span
                   className={`px-3 py-1 rounded-full text-sm ${
                     shift.status === "Completed"
@@ -165,9 +177,18 @@ const StaffDashboard = () => {
                 >
                   {shift.status}
                 </span>
+                <Button 
+                  onClick={() => handleSubmitReport(shift.id)}
+                  variant="outline"
+                  size="sm"
+                >
+                  <FileText className="w-4 h-4 mr-1" />
+                  Submit Report
+                </Button>
               </div>
             </div>
-          ))}
+          </div>
+        ))}
           {recentShifts.length === 0 && (
             <div className="p-6 text-center text-gray-500">
               No recent shifts found

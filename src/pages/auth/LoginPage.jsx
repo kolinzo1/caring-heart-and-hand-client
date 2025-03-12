@@ -55,28 +55,7 @@ const LoginPage = () => {
             <p className="text-gray-600 mt-2">Access your dashboard</p>
           </div>
 
-          {/* Test Credentials Info */}
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-            <h2 className="font-medium text-blue-800 mb-2">
-              Test Credentials:
-            </h2>
-            <div className="space-y-2 text-sm text-blue-700">
-              <p>
-                Staff Account:
-                <br />
-                Email: staff@example.com
-                <br />
-                Password: staffpass123
-              </p>
-              <p>
-                Admin Account:
-                <br />
-                Email: admin@example.com
-                <br />
-                Password: adminpass123
-              </p>
-            </div>
-          </div>
+          
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -95,7 +74,6 @@ const LoginPage = () => {
                 />
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-medium mb-1">Password</label>
               <div className="relative">

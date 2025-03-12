@@ -102,8 +102,20 @@ const TimeClockForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('API URL:', process.env.REACT_APP_API_URL);
+    console.log('API endpoint:', `${process.env.REACT_APP_API_URL}/api/time-logs`);
+    
 
-    if (!formData.clientId || !formData.startTime || !formData.endTime || !formData.serviceType) {
+    const submissionData = {
+      ...formData,
+      clientId: parseInt(formData.clientId, 10),
+      startTime: formData.startTime + ':00',
+      endTime: formData.endTime + ':00', // Convert to number
+    };
+
+    console.log('Form Data being submitted:', submissionData);
+  
+    if (!submissionData.clientId || !submissionData.startTime || !submissionData.endTime || !submissionData.serviceType) {
       addToast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -113,37 +125,45 @@ const TimeClockForm = () => {
     }
 
     setIsLoading(true);
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/time-clock`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
+  try {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/time-logs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(submissionData),
+    });
 
-      if (!response.ok) {
-        throw new Error('Failed to log shift');
-      }
+    // Log the full response
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+    
+    const responseData = await response.json();
+    console.log('Response data:', responseData);
 
-      addToast({
-        title: "Success",
-        description: "Shift logged successfully",
-        variant: "success",
-      });
-
-      navigate("/staff/shift-history");
-    } catch (error) {
-      addToast({
-        title: "Error",
-        description: "Failed to log shift",
-        variant: "error",
-      });
-    } finally {
-      setIsLoading(false);
+    if (!response.ok) {
+      throw new Error(`Failed to log shift: ${responseData.message || response.statusText}`);
     }
-  };
+
+    addToast({
+      title: "Success",
+      description: "Shift logged successfully",
+      variant: "success",
+    });
+
+    navigate("/staff/shift-history");
+  } catch (error) {
+    console.error('Error submitting shift:', error);
+    addToast({
+      title: "Error",
+      description: error.message || "Failed to log shift",
+      variant: "error",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="container mx-auto p-6 max-w-2xl">
