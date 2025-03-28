@@ -75,6 +75,10 @@ const TeamManagement = () => {
   useEffect(() => {
     if (token) {
       fetchTeamMembers();
+    } else {
+      // Handle missing token scenario
+      setIsLoading(false);
+      console.error('No authentication token available');
     }
   }, [token]);
 

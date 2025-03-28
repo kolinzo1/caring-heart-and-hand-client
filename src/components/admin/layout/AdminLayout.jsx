@@ -30,6 +30,11 @@ const AdminLayout = () => {
       icon: Users
     },
     { 
+      name: 'Care Requests',
+      href: '/admin/care-requests',
+      icon: FileText
+    },
+    { 
       name: 'Job Positions',
       href: '/admin/positions',
       icon: Briefcase

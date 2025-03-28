@@ -20,15 +20,18 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     try {
+      console.log('Attempting login with:', formData.email);
       const result = await login(formData);
+      console.log('Login successful, user role:', result.role);
+      
       addToast({
         title: "Success",
         description: "Logged in successfully",
         variant: "success",
       });
-
+  
       // Navigate based on role
       if (result.role === "admin") {
         navigate("/admin/dashboard");
@@ -36,6 +39,7 @@ const LoginPage = () => {
         navigate("/staff/dashboard");
       }
     } catch (error) {
+      console.error('Login error:', error);
       addToast({
         title: "Error",
         description: "Invalid email or password",

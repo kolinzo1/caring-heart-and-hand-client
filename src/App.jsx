@@ -29,6 +29,7 @@ import TimeLogsManagement from "./pages/admin/TimeLogsManagement";
 import AdminSettings from "./pages/admin/AdminSettings";
 import ScheduleOverview from "./pages/admin/ScheduleOverview";
 import StaffPerformance from "./pages/admin/StaffPerformance";
+import CareRequestsManagement from "./pages/admin/CareRequestsManagement";
 
 
 // Protected Staff Pages
@@ -78,6 +79,7 @@ const App = () => {
                 <Route path="settings" element={<AdminSettings />} />
                 <Route path="schedule" element={<ScheduleOverview />} />
                 <Route path="performance" element={<StaffPerformance />} />
+                <Route path="care-requests" element={<CareRequestsManagement />} />
               </Route>
               
               {/* Protected Staff Routes */}

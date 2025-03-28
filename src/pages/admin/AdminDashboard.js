@@ -43,7 +43,6 @@ const AdminDashboard = () => {
       try {
         console.log('Fetching dashboard data...');
         console.log('API URL:', process.env.REACT_APP_API_URL);
-        console.log('Token:', token);
         
         setIsLoading(true);
         setError(null);
@@ -66,7 +65,14 @@ const AdminDashboard = () => {
     };
   
     fetchDashboardData();
+    
+    // Set up periodic refresh every 2 minutes
+    const refreshInterval = setInterval(fetchDashboardData, 120000);
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(refreshInterval);
   }, [token, navigate]);
+    
 
   if (isLoading) {
     console.log('Showing loading skeleton');
@@ -94,6 +100,11 @@ const AdminDashboard = () => {
 
   const { stats } = dashboardData;
 
+  // Added navigation handler for care requests
+  const handleViewCareRequests = () => {
+    navigate('/admin/care-requests');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
@@ -115,6 +126,8 @@ const AdminDashboard = () => {
             icon={<FileText className="w-8 h-8 text-purple-500" />}
             title="Active Requests"
             value={stats.activeRequests || 0}
+            onClick={handleViewCareRequests}
+            className="cursor-pointer hover:shadow-md transition-shadow"
           />
           <StatCard
             icon={<DollarSign className="w-8 h-8 text-yellow-500" />}
@@ -150,25 +163,25 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Staff Performance Card */}
+          {/* Care Requests Card */}
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Staff Performance
+                Care Requests
               </CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
+              <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <p className="text-sm text-gray-500">
-                  Monitor staff metrics and performance
+                  Manage new care requests and client inquiries
                 </p>
                 <Button 
                   variant="outline" 
                   className="w-full"
-                  onClick={() => navigate('/admin/performance')}
+                  onClick={handleViewCareRequests}
                 >
-                  View Performance
+                  View Requests
                   <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
