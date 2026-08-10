@@ -4,13 +4,33 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#0066cc" />
     <meta
       name="description"
-      content="Caring Heart & Hand - Professional Home Care Services"
+      content="Caring Heart & Hand provides professional, compassionate home care services in Knoxville, TN — personal care, companion care, respite care, and post-hospital care. Licensed & insured. Call (423) 748-3508."
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Caring Heart & Hand" />
+    <meta property="og:title" content="Caring Heart & Hand - Professional Home Care Services" />
+    <meta
+      property="og:description"
+      content="Compassionate, professional home care services in Knoxville, TN. Personal care, companion care, respite care, and post-hospital care. Licensed & insured."
+    />
+    <meta property="og:image" content="%PUBLIC_URL%/assets/images/hero-bg.jpg" />
+    <meta property="og:url" content="https://www.caringheartandhand.org" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Caring Heart & Hand - Professional Home Care Services" />
+    <meta
+      name="twitter:description"
+      content="Compassionate, professional home care services in Knoxville, TN. Licensed & insured."
+    />
+    <meta name="twitter:image" content="%PUBLIC_URL%/assets/images/hero-bg.jpg" />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -20,7 +40,28 @@
       rel="stylesheet"
     />
 
-    <title>Caring Heart & Hand</title>
+    <!-- Local business structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HomeHealthCareService",
+        "name": "Caring Heart & Hand",
+        "image": "https://www.caringheartandhand.org/assets/images/hero-bg.jpg",
+        "url": "https://www.caringheartandhand.org",
+        "telephone": "+1-423-748-3508",
+        "email": "admin@caringheartandhand.org",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "200 Prosperity Drive",
+          "addressLocality": "Knoxville",
+          "addressRegion": "TN",
+          "postalCode": "37923",
+          "addressCountry": "US"
+        }
+      }
+    </script>
+
+    <title>Caring Heart & Hand - Professional Home Care Services in Knoxville, TN</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

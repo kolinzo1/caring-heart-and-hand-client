@@ -1,10 +1,12 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { ApplicantAuthProvider } from "./context/ApplicantAuthContext";
 import { ToastProvider } from "./components/ui/Notifications/toast";
 import Layout from "./components/layout/Layout";
 import AdminLayout from "./components/admin/layout/AdminLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ApplicantProtectedRoute from "./components/auth/ApplicantProtectedRoute";
 import ErrorBoundary from './components/error/ErrorBoundary';
 
 // Public Pages
@@ -18,10 +20,14 @@ import RequestConfirmationPage from "./pages/RequestConfirmationPage";
 import LoginPage from "./pages/auth/LoginPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import CareersPage from "./pages/CareersPage";
+import ApplicantLoginPage from "./pages/onboarding/ApplicantLoginPage";
+import ApplicantRegisterPage from "./pages/onboarding/ApplicantRegisterPage";
+import OnboardingDashboard from "./pages/onboarding/OnboardingDashboard";
 
 // Protected Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import TeamManagement from "./pages/admin/TeamManagement";
+import ClientManagement from "./pages/admin/ClientManagement";
 import JobPositionsManagement from "./pages/admin/JobPositionsManagement";
 import ApplicationsManagement from "./pages/admin/ApplicationsManagement";
 import BlogManagement from "./pages/admin/BlogManagement";
@@ -30,6 +36,7 @@ import AdminSettings from "./pages/admin/AdminSettings";
 import ScheduleOverview from "./pages/admin/ScheduleOverview";
 import StaffPerformance from "./pages/admin/StaffPerformance";
 import CareRequestsManagement from "./pages/admin/CareRequestsManagement";
+import OnboardingManagement from "./pages/admin/OnboardingManagement";
 
 
 // Protected Staff Pages
@@ -44,6 +51,7 @@ const App = () => {
     <ErrorBoundary>
       <Router>
         <ToastProvider>
+          <ApplicantAuthProvider>
           <AuthProvider>
             <Routes>
               {/* Public Routes */}
@@ -57,6 +65,18 @@ const App = () => {
               <Route path="/login" element={<Layout><LoginPage /></Layout>} />
               <Route path="/forgot-password" element={<Layout><ForgotPasswordPage /></Layout>} />
               <Route path="/careers" element={<Layout><CareersPage /></Layout>} />
+              <Route path="/portal/login" element={<Layout><ApplicantLoginPage /></Layout>} />
+              <Route path="/portal/register" element={<Layout><ApplicantRegisterPage /></Layout>} />
+              <Route
+                path="/portal/onboarding"
+                element={
+                  <Layout>
+                    <ApplicantProtectedRoute>
+                      <OnboardingDashboard />
+                    </ApplicantProtectedRoute>
+                  </Layout>
+                }
+              />
 
               {/* Protected Admin Routes */}
               <Route
@@ -72,6 +92,7 @@ const App = () => {
                 <Route index element={<AdminDashboard />} />
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="team" element={<TeamManagement />} />
+                <Route path="clients" element={<ClientManagement />} />
                 <Route path="positions" element={<JobPositionsManagement />} />
                 <Route path="applications" element={<ApplicationsManagement />} />
                 <Route path="blog" element={<BlogManagement />} />
@@ -80,6 +101,7 @@ const App = () => {
                 <Route path="schedule" element={<ScheduleOverview />} />
                 <Route path="performance" element={<StaffPerformance />} />
                 <Route path="care-requests" element={<CareRequestsManagement />} />
+                <Route path="onboarding" element={<OnboardingManagement />} />
               </Route>
               
               {/* Protected Staff Routes */}
@@ -102,6 +124,7 @@ const App = () => {
               />
             </Routes>
           </AuthProvider>
+          </ApplicantAuthProvider>
         </ToastProvider>
       </Router>
     </ErrorBoundary>

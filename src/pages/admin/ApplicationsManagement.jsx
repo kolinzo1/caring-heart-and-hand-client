@@ -67,9 +67,13 @@ const ApplicationsManagement = () => {
       label: "Accepted", 
       color: "bg-green-100 text-green-800" 
     },
-    rejected: { 
-      label: "Rejected", 
-      color: "bg-red-100 text-red-800" 
+    rejected: {
+      label: "Rejected",
+      color: "bg-red-100 text-red-800"
+    },
+    hired: {
+      label: "Hired",
+      color: "bg-emerald-100 text-emerald-800",
     },
   };
 

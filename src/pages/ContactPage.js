@@ -73,8 +73,16 @@ const ContactPage = () => {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
+      const response = await fetch(`${API_URL}/api/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
 
       addToast({
         title: "Message Sent!",

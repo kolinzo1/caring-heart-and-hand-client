@@ -10,7 +10,8 @@ import {
   Clock,
   Settings,
   Calendar,
-  Activity
+  Activity,
+  ClipboardCheck
 } from 'lucide-react';
 
 const AdminLayout = () => {
@@ -30,6 +31,11 @@ const AdminLayout = () => {
       icon: Users
     },
     { 
+      name: 'Client Management',
+      href: '/admin/clients',
+      icon: Users
+    },
+    { 
       name: 'Care Requests',
       href: '/admin/care-requests',
       icon: FileText
@@ -44,7 +50,12 @@ const AdminLayout = () => {
       href: '/admin/applications',
       icon: FileText
     },
-    { 
+    {
+      name: 'Onboarding',
+      href: '/admin/onboarding',
+      icon: ClipboardCheck
+    },
+    {
       name: 'Blog Management',
       href: '/admin/blog',
       icon: BookOpen

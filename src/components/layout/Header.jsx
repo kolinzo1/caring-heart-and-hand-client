@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X, User, Phone } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { Button } from "../ui/button";
 
@@ -69,6 +69,13 @@ const Header = () => {
 
             {/* Auth/Portal Buttons */}
             <div className="flex items-center space-x-4">
+              <a
+                href="tel:4237483508"
+                className="flex items-center text-sm font-semibold text-primary hover:text-primary/80"
+              >
+                <Phone className="w-4 h-4 mr-1.5" />
+                (423) 748-3508
+              </a>
               <Link
                 to="/request-care"
                 className="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90"
@@ -173,6 +180,14 @@ const Header = () => {
               </Link>
             ))}
             <div className="border-t border-gray-200 mt-2 pt-2 space-y-2">
+              <a
+                href="tel:4237483508"
+                className="flex items-center justify-center gap-2 w-full text-center border-2 border-primary text-primary px-4 py-2 rounded-md font-semibold"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Phone className="w-4 h-4" />
+                Call (423) 748-3508
+              </a>
               <Link
                 to="/request-care"
                 className="block w-full text-center bg-primary text-white px-4 py-2 rounded-md"

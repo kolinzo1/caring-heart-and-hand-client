@@ -75,7 +75,7 @@ export const teamService = {
   
       const response = await api.post("/api/careers/apply", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': undefined,
         },
       });
       return response.data;
@@ -94,7 +94,7 @@ export const teamService = {
 
   
   async updateApplicationStatus(id, status) {
-    const response = await api.put(`/careers/applications/${id}/status`, {
+    const response = await api.put(`/api/careers/applications/${id}/status`, {
       status,
     });
     return response.data;

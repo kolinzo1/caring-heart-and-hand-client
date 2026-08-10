@@ -39,23 +39,16 @@ const AboutPage = () => {
         {
           name: "Matilda Oyedele",
           role: "CEO & Founder",
-          image: "../assets/images/team/matilda.jpg",
+          image: "/assets/images/team/matilda.jpg",
           description:
             "With over 15 years of experience in healthcare management, Matilda leads our team with vision and compassion.",
         },
         {
-          name: "Sarah Johnson",
-          role: "Director of Care Services",
-          image: "/images/director.jpg",
+          name: "Kola Oyedele",
+          role: "Director of Corporate",
+          image: "/assets/images/team/kola-oyedele.jpg",
           description:
-            "A registered nurse with extensive experience in home care coordination and team management.",
-        },
-        {
-          name: "David Chen",
-          role: "Quality Assurance Manager",
-          image: "/images/manager.jpg",
-          description:
-            "Ensures the highest standards of care through continuous monitoring and improvement of our services.",
+            "An engineer with over 30 years of IT and project management experience, Kola drives operational excellence across our corporate systems.",
         },
       ];
 
@@ -274,9 +267,9 @@ const AboutPage = () => {
               <Button onClick={fetchTeamData}>Retry</Button>
             </div>
           ) : (
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
               {isLoading
-                ? [...Array(3)].map((_, index) => (
+                ? [...Array(2)].map((_, index) => (
                     <TeamMemberSkeleton key={index} />
                   ))
                 : teamData.map((member, index) => (
