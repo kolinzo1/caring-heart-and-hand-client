@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginSuccess, logout as reduxLogout } from "../redux/slices/authSlice";
 
 const AuthContext = createContext();
 
@@ -9,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
   // Check for existing auth on mount
   useEffect(() => {
@@ -94,11 +97,20 @@ export const AuthProvider = ({ children }) => {
       
       // Store token in localStorage for persistence
       localStorage.setItem("token", data.token);
-      
+
       // Update context state
       setToken(data.token);
       setUser(data.user);
-      
+
+      // Keep the Redux auth slice in sync — some admin pages (e.g.
+      // ClientManagement, TeamManagement) read their token from Redux
+      // rather than this context.
+      dispatch(loginSuccess({
+        user: data.user,
+        token: data.token,
+        userRole: data.user?.role,
+      }));
+
       return data.user;
     } catch (error) {
       console.error("Login error:", error);
@@ -111,7 +123,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);
-    
+    dispatch(reduxLogout());
+
     // Call logout endpoint if available
     try {
       const API_URL = process.env.REACT_APP_API_URL;

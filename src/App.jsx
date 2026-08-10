@@ -27,6 +27,7 @@ import OnboardingDashboard from "./pages/onboarding/OnboardingDashboard";
 // Protected Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import TeamManagement from "./pages/admin/TeamManagement";
+import ClientManagement from "./pages/admin/ClientManagement";
 import JobPositionsManagement from "./pages/admin/JobPositionsManagement";
 import ApplicationsManagement from "./pages/admin/ApplicationsManagement";
 import BlogManagement from "./pages/admin/BlogManagement";
@@ -91,6 +92,7 @@ const App = () => {
                 <Route index element={<AdminDashboard />} />
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="team" element={<TeamManagement />} />
+                <Route path="clients" element={<ClientManagement />} />
                 <Route path="positions" element={<JobPositionsManagement />} />
                 <Route path="applications" element={<ApplicationsManagement />} />
                 <Route path="blog" element={<BlogManagement />} />
