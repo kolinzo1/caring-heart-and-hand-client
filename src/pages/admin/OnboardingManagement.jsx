@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../components/ui/dialog";
-import { CheckCircle2, XCircle, Clock, Circle, Plus } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, Circle, Plus, Download } from "lucide-react";
 
 const CATEGORY_LABELS = {
   tax_forms: "Tax / Payroll",
@@ -94,6 +94,24 @@ const OnboardingManagement = () => {
     }
   };
 
+  const handleDownloadPdf = async (e, applicant) => {
+    e.stopPropagation();
+    try {
+      const response = await onboardingService.downloadOnboardingPdf(applicant.application_id);
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `onboarding-${applicant.last_name}-${applicant.first_name}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      addToast({ title: "Error", description: "Failed to download PDF", variant: "error" });
+    }
+  };
+
   const handleReview = async (submissionId, status) => {
     try {
       await onboardingService.reviewSubmission(submissionId, status, reviewNotes[submissionId] || "");
@@ -164,11 +182,21 @@ const OnboardingManagement = () => {
                         <p className="font-medium">{a.first_name} {a.last_name}</p>
                         <p className="text-sm text-gray-500">{a.email}</p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium">{pct}% complete</p>
-                        <p className="text-xs text-gray-500">
-                          {a.has_portal_account ? "Portal account created" : "Not registered yet"}
-                        </p>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="text-sm font-medium">{pct}% complete</p>
+                          <p className="text-xs text-gray-500">
+                            {a.has_portal_account ? "Portal account created" : "Not registered yet"}
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => handleDownloadPdf(e, a)}
+                        >
+                          <Download className="w-4 h-4 mr-1" />
+                          PDF
+                        </Button>
                       </div>
                     </div>
                   );

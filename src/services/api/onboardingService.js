@@ -11,6 +11,13 @@ export const onboardingService = {
     return response.data;
   },
 
+  downloadOnboardingPdf: async (applicationId) => {
+    const response = await api.get(`/api/onboarding/applicants/${applicationId}/pdf`, {
+      responseType: "blob",
+    });
+    return response;
+  },
+
   reviewSubmission: async (submissionId, status, adminNotes) => {
     const response = await api.put(`/api/onboarding/submissions/${submissionId}/review`, {
       status,
