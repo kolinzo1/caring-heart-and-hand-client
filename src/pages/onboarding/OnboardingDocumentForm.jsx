@@ -17,7 +17,7 @@ const OnboardingDocumentForm = ({ document, onSubmitted, onCancel }) => {
   if (structuredFields) {
     structuredFields.forEach((f) => {
       initialFieldValues[f.name] = document.form_data
-        ? JSON.parse(document.form_data)[f.name] || ""
+        ? document.form_data[f.name] || ""
         : "";
     });
   }

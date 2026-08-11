@@ -239,14 +239,14 @@ const OnboardingManagement = () => {
                           <span className="text-sm text-gray-500">{meta.label}</span>
                         </div>
 
-                        {s.status === "submitted" && (
+                        {s.submission_id && (
                           <div className="mt-3 space-y-2">
                             {s.signed_name && (
                               <p className="text-sm text-gray-600">Signed by: {s.signed_name}</p>
                             )}
                             {s.form_data && (
                               <pre className="text-xs bg-gray-50 p-2 rounded overflow-x-auto">
-                                {JSON.stringify(JSON.parse(s.form_data), null, 2)}
+                                {JSON.stringify(s.form_data, null, 2)}
                               </pre>
                             )}
                             {s.uploaded_file_url && (
@@ -259,25 +259,32 @@ const OnboardingManagement = () => {
                                 View uploaded file
                               </a>
                             )}
-                            <Textarea
-                              placeholder="Notes (optional)"
-                              value={reviewNotes[s.submission_id] || ""}
-                              onChange={(e) =>
-                                setReviewNotes((prev) => ({ ...prev, [s.submission_id]: e.target.value }))
-                              }
-                            />
-                            <div className="flex gap-2">
-                              <Button size="sm" onClick={() => handleReview(s.submission_id, "approved")}>
-                                Approve
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleReview(s.submission_id, "rejected")}
-                              >
-                                Reject
-                              </Button>
-                            </div>
+                            {s.admin_notes && (
+                              <p className="text-sm text-gray-600">Notes: {s.admin_notes}</p>
+                            )}
+                            {s.status === "submitted" && (
+                              <>
+                                <Textarea
+                                  placeholder="Notes (optional)"
+                                  value={reviewNotes[s.submission_id] || ""}
+                                  onChange={(e) =>
+                                    setReviewNotes((prev) => ({ ...prev, [s.submission_id]: e.target.value }))
+                                  }
+                                />
+                                <div className="flex gap-2">
+                                  <Button size="sm" onClick={() => handleReview(s.submission_id, "approved")}>
+                                    Approve
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleReview(s.submission_id, "rejected")}
+                                  >
+                                    Reject
+                                  </Button>
+                                </div>
+                              </>
+                            )}
                           </div>
                         )}
                       </div>
